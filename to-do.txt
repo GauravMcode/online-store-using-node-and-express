@@ -1,0 +1,16 @@
+dynamic routes and querry params:
+
+- Adding the product ID to path 
+- Extracting Dynamic Params
+- Loading Product Detail Data
+- Rendering the product Detail View
+- passing Data with POST Requests
+- Adding a Cart Model
+- Using Querry Params
+- Pre-Populating the Edit Product Page with Data
+- Linking to the Edit Page
+- Editing the Product Data
+- Adding the product-Delete Functionality
+- Deleting Cart Items
+- Display Cart Items on the Cart Page
+- Deleting Cart Items
