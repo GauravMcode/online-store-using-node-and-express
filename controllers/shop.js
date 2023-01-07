@@ -2,40 +2,46 @@ const Product = require('../models/product');
 const Cart = require('../models/cart');
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll(products => {
-    res.render('shop/product-list', {
-      prods: products,
-      pageTitle: 'All Products',
-      path: '/products'
-    });
-  });
+  Product.fetchAll().
+    then(([products, fieldData]) => {
+      console.log(products);
+      res.render('shop/product-list', {
+        prods: products,
+        pageTitle: 'All Products',
+        path: '/products'
+      });
+    }).catch(err => { console.log(err); });
 };
 
 exports.getProductDetails = (req, res, next) => {
   const prodId = req.params.productID;
   // console.log(prodId);
-  Product.getProductWithId(prodId, (prod) => {
+  Product.getProductWithId(prodId).then(([[prod], fieldData]) => {  //double square brac because prod is array inside array
     res.render('shop/product-detail', {
       product: prod,
       pageTitle: `Details`,
       path: '/products'
     });
-  });
+  }).catch(err => console.log(err))
 }
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll(products => {
-    res.render('shop/index', {
-      prods: products,
-      pageTitle: 'Shop',
-      path: '/'
-    });
-  });
+
+  Product.fetchAll().
+    then(([products, fieldData]) => {
+      res.render('shop/index', {
+        prods: products,
+        pageTitle: 'Shop',
+        path: '/'
+      });
+    }).catch(err => { console.log(err); });
 };
 
 exports.postAddtoCart = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.getProductWithId(prodId, (product) => {
+  console.log(prodId);
+  Product.getProductWithId(prodId).then(([[product], fieldData]) => {
+    console.log(product);
     Cart.fetchCart((cart) => {
       console.log(cart.length);
       if (cart.totalPrice) {   //if cart has atleast 1 object
@@ -63,7 +69,7 @@ exports.postAddtoCart = (req, res, next) => {
       }
 
     });
-  })
+  }).catch(err => console.log(err))
   //todo : implement adding the (prodId and qty in product and totalprice ) in cart
 
 
@@ -72,18 +78,19 @@ exports.postAddtoCart = (req, res, next) => {
 
 exports.getCart = (req, res, next) => {
   Cart.fetchCart((cart) => {
-    Product.fetchAll((products) => {
-      const productsList = [];
-      for (const prod of cart.products) {
-        productsList.push(products.find((p) => p.id === prod.id));
-      }
-      res.render('shop/cart', {
-        path: '/cart',
-        pageTitle: 'Your Cart',
-        products: productsList,
-        cart: cart,
-      });
-    })
+    Product.fetchAll().
+      then(([products, fieldData]) => {
+        const productsList = [];
+        for (const prod of cart.products) {
+          productsList.push(products.find((p) => p.id === prod.id));
+        }
+        res.render('shop/cart', {
+          path: '/cart',
+          pageTitle: 'Your Cart',
+          products: productsList,
+          cart: cart,
+        });
+      }).catch(err => { console.log(err); });
   });
 };
 

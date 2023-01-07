@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const db = require('../util/database');
+
 const p = path.join(
   path.dirname(process.mainModule.filename),
   'data',
@@ -26,14 +28,10 @@ module.exports = class Product {
   }
 
   save() {
-    this.id = Math.random().toString();
-    getProductsFromFile(products => {
-      products.push(this);
-      fs.writeFile(p, JSON.stringify(products), err => {
-        console.log(err);
-      });
-    });
+    console.log(this);
+    return db.execute(`INSERT INTO products (title, imageUrl, description, price) VALUES ("${this.title}", "${this.imageUrl}", "${this.description}", "${this.price}")`);
   }
+  //`INSERT INTO products (title, imageUrl, description, price) VALUES ("${this.title}", "${this.imageUrl}", "${this.description}", "${this.price}")` 
 
   update(cb) {
     getProductsFromFile((products) => {
@@ -55,14 +53,11 @@ module.exports = class Product {
     })
   }
 
-  static getProductWithId(id, cb) {
-    getProductsFromFile((prods) => {
-      const product = prods.find((prod) => prod.id === id)
-      cb(product);
-    });
+  static getProductWithId(id) {
+    return db.execute(`SELECT * FROM products WHERE products.id = ${id}`);
   }
 
-  static fetchAll(cb) {
-    getProductsFromFile(cb);
+  static fetchAll() {
+    return db.execute('SELECT * FROM products');
   }
 };
