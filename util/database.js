@@ -1,12 +1,8 @@
-//used to connect to database and send queries
+const Sequelize = require('sequelize');
 
-const mysql = require('mysql2');
-
-const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    database: 'node-complete',
-    password: 'fireup'
+const sequelize = new Sequelize('node-complete', 'root', 'fireup', {
+    dialect: 'mysql',
+    host: 'localhost'
 });
 
-module.exports = pool.promise();  //exports promise of pool (to asyncronously call queries)
+module.exports = sequelize;
