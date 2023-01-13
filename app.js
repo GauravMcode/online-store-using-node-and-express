@@ -4,7 +4,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const errorController = require('./controllers/error');
-const sequelize = require('./util/database')
+
+const mongoclient = require('./util/database').mongoclient;
 
 const app = express();
 
@@ -13,17 +14,14 @@ app.set('views', 'views');
 
 const adminRoutes = require('./routes/admin');
 const shopRoutes = require('./routes/shop');
-const Product = require('./models/product');
 const User = require('./models/user');
-const Cart = require('./models/cart');
-const CartItem = require('./models/cart-item');
-const Order = require('./models/order');
-const OrderItem = require('./models/order-item');
+
 
 app.use((req, res, next) => {
-    User.findByPk(1)
+    User.findById('63c163db08fae179f9523fad')
         .then((user => {
-            req.user = user;
+            req.user = new User(user.username, user.email, user.cart, user._id);
+            console.log(user);
             next();
         }))
         .catch(err => console.log(err));
@@ -37,50 +35,9 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-//defining One-To-Many relationship
-Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
-User.hasMany(Product);
+mongoclient(() => {
+    app.listen(3000);
+});
 
-//one-to-one relationship betweeen cart and user
-Cart.belongsTo(User);
-User.hasOne(Cart);
 
-//many-to-many relationship between cart and products in the junction table :cartItem
-Cart.belongsToMany(Product, { through: CartItem });
-Product.belongsToMany(Cart, { through: CartItem });
-
-//one-to-many relationship between user and order
-Order.belongsTo(User);
-User.hasMany(Order);
-
-//many-to-many relationship between order and products
-Order.belongsToMany(Product, { through: OrderItem });
-Product.belongsToMany(Order, { through: OrderItem });
-
-let theUser; //to save user here, accessed in the promise
-
-sequelize
-    .sync()
-    // .sync({ force: true })   //force:true overrides existing tables
-    .then(() => User.findByPk(1))
-    .then((user) => {
-        if (!user) {
-            return User.create({ name: 'Gaurav', email: 'test@test.com' });
-        }
-        return user;
-    })
-    .then(user => {
-        theUser = user;
-        return user.getCart();
-    })
-    .then((cart) => {
-        if (!cart) {
-            return theUser.createCart();   //creates cart for that user (in this case user 1) : its important to create cart before accessing it
-        }
-        return cart;
-    })
-    .then(cart => {
-        app.listen(3000);
-    })
-    .catch((err) => { console.log(err); });
 
