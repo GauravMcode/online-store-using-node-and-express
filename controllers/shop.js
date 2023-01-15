@@ -1,107 +1,123 @@
+
+const Order = require('../models/order');
 const Product = require('../models/product');
-const Cart = require('../models/cart');
+const user = require('../models/user');
+
+
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll(products => {
-    res.render('shop/product-list', {
-      prods: products,
-      pageTitle: 'All Products',
-      path: '/products'
+  Product.find()   //method provided by the mongoose to fetch all the products from the database
+    .then((products) => {
+      res.render('shop/product-list', {
+        prods: products,
+        pageTitle: 'All Products',
+        path: '/products'
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  });
 };
 
 exports.getProductDetails = (req, res, next) => {
   const prodId = req.params.productID;
-  // console.log(prodId);
-  Product.getProductWithId(prodId, (prod) => {
-    res.render('shop/product-detail', {
-      product: prod,
-      pageTitle: `Details`,
-      path: '/products'
-    });
-  });
+  Product.findById(prodId) //findById is the mongoose method,Also  we can even pass a string to find by id and mongoose will automatically convert this to an object ID,
+    .then((product) => {
+      res.render('shop/product-detail', {
+        product: product,
+        pageTitle: product.title,
+        path: '/products'
+      });
+    })
+    .catch(err => console.log(err));
 }
 
 exports.getIndex = (req, res, next) => {
-  Product.fetchAll(products => {
-    res.render('shop/index', {
-      prods: products,
-      pageTitle: 'Shop',
-      path: '/'
+  Product.find()
+    .then((products) => {
+      res.render('shop/index', {
+        prods: products,
+        pageTitle: 'Shop',
+        path: '/'
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  });
 };
 
 exports.postAddtoCart = (req, res, next) => {
   const prodId = req.body.productId;
-  Product.getProductWithId(prodId, (product) => {
-    Cart.fetchCart((cart) => {
-      console.log(cart.length);
-      if (cart.totalPrice) {   //if cart has atleast 1 object
-        const cartItem = cart.products.find((c) => c.id === product.id);
-        const index = cart.products.findIndex((prod) => prod.id === prodId);
-        console.log(index);
-        if (cartItem) {
-          var totalPrice = parseFloat(cart.totalPrice);
-          cart.products[index].qty += 1;
-          totalPrice += parseFloat(product.price);
-          const cartData = new Cart(cart.products, totalPrice);
-          cartData.save();
-        } else {
-          cart.products.push({ id: prodId, qty: 1 });
-          cart.totalPrice += parseFloat(product.price);
-          const cartData = new Cart(cart.products, parseFloat(cart.totalPrice));
-          cartData.save();
-        }
-      }
-      else {
-        cart.products = [{ id: prodId, qty: 1 }];
-        cart.totalPrice = parseFloat(product.price);
-        const cartData = new Cart(cart.products, cart.totalPrice);
-        cartData.save();
-      }
-
-    });
-  })
-  //todo : implement adding the (prodId and qty in product and totalprice ) in cart
-
-
-  res.redirect('/products');
+  req.user.addToCart(prodId)
+    .then(result => {
+      res.redirect('/cart')
+      // console.log(result);
+    })
+    .catch(err => console.log(err))
 }
 
 exports.getCart = (req, res, next) => {
-  Cart.fetchCart((cart) => {
-    Product.fetchAll((products) => {
-      const productsList = [];
-      for (const prod of cart.products) {
-        productsList.push(products.find((p) => p.id === prod.id));
-      }
+  req.user
+    .populate('cart.items.productId')  //to populate productId with Product Objects
+    // .execPopulate()  //as populate doesn't returns a promise, to use then on it, we use execPopulate() here
+    .then((user) => {
+      const products = user.cart.items;
       res.render('shop/cart', {
         path: '/cart',
         pageTitle: 'Your Cart',
-        products: productsList,
-        cart: cart,
+        products: products,
       });
     })
-  });
+    .catch(err => { console.log(err); });
+
 };
 
 exports.deleteCartItem = (req, res, next) => {
   const id = req.body.id;
-  console.log(id);
-  Product.getProductWithId(id, (prod) => {
-    Cart.delete(id, prod.price, () => {
+  req.user.deleteCartItem(id)
+    .then(() => {
       res.redirect('/cart');
-    });
-  })
+    })
+    .catch(err => console.log(err))
+
+}
+
+exports.postCreateOrder = (req, res, next) => {
+  console.log('creating order.........');
+  req.user
+    .populate('cart.items.productId')
+    .then((user) => {
+      const products = user.cart.items.map(i => {
+        return { quantity: i.quantity, product: { ...i.productId._doc } } //with ._doc we get access to just the data that's in there and not the meta-data
+      });
+      const order = new Order({
+        products: products,
+        user: {
+          name: req.user.name,
+          userId: req.user._id
+        }
+      })
+      order.save();
+    })
+    .then(result => {
+      req.user.clearCart();
+    })
+    .then(result => {
+      res.redirect('/orders');
+    })
+    .catch(err => console.log(err))
 }
 
 exports.getOrders = (req, res, next) => {
-  res.render('shop/orders', {
-    path: '/orders',
-    pageTitle: 'Your Orders'
-  });
+  Order.find({ 'user.userId': req.user._id })
+    .then((orders) => {
+      console.log(orders[0].products);
+      res.render('shop/orders', {
+        path: '/orders',
+        pageTitle: 'Your Orders',
+        orders: orders
+      });
+    })
 };
 
 exports.getCheckout = (req, res, next) => {

@@ -1,5 +1,8 @@
+
+const { deleteById } = require('../models/product');
 const Product = require('../models/product');
-const Cart = require('../models/cart');
+// const Cart = require('../models/cart');
+// const User = require('../models/user');
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -18,58 +21,71 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(title, imageUrl, description, price);
-  product.save();
-  res.redirect('/');
+  const product = new Product({ title: title, price: price, description: description, imageUrl: imageUrl, userId: req.user._id });
+  product.save()   //save is the method by mongoose for that model
+    .then((result) => {    //although save method doesn't returns a promise but gives a then & catch bloc
+      console.log('product added');
+      res.redirect('/admin/products');
+    })
+    .catch((err) => { console.log(err); });
 };
 
 exports.getEditProduct = (req, res, next) => {
   const prodId = req.params.productId;
   const editMode = req.query.edit
   console.log(editMode);
-  Product.getProductWithId(prodId, (product) => {
-    res.render('admin/edit-product', {
-      pageTitle: 'Edit Product',
-      path: '/admin/products',
-      product: product,
-      editing: editMode,
-      formsCSS: true,
-      productCSS: true,
-    });
-  })
-
+  Product.findById(prodId)
+    .then((product) => {
+      res.render('admin/edit-product', {
+        pageTitle: 'Edit Product',
+        path: '/admin/products',
+        product: product,
+        editing: editMode,
+        formsCSS: true,
+        productCSS: true,
+      });
+    })
+    .catch(err => console.log(err));
 };
 
 exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.id;
   console.log(prodId);
-  Product.getProductWithId(prodId, (prod) => {
-    prod.title = req.body.title;
-    prod.imageUrl = req.body.imageUrl;
-    prod.price = req.body.price;
-    prod.description = req.body.description;
-    const product = new Product(prod.title, prod.imageUrl, prod.description, prod.price);
-    product.id = prodId;
-    product.update();
-    res.redirect('/products');
-  })
+  const title = req.body.title;
+  const imageUrl = req.body.imageUrl;
+  const price = req.body.price;
+  const description = req.body.description;
+  Product.findById(prodId)
+    .then(product => {
+      //product returned by findById is not a JS object but is a complete mongoose object. Therefore, we can call methods like save() on it
+      product.title = title,
+        product.price = price,
+        product.imageUrl = imageUrl,
+        product.description = description
+      return product.save()  //if save is passed to an existing product, it won't create a new product; instead it will update it.
+    })
+    .then(() => {
+      res.redirect('../admin/products');
+    })
+    .catch(err => console.log(err))
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll(products => {
-    res.render('admin/products', {
-      prods: products,
-      pageTitle: 'Admin Products',
-      path: '/admin/products'
-    });
-  });
+  Product.find()
+    .then((products) => {
+      res.render('admin/products', {
+        prods: products,
+        pageTitle: 'Admin Products',
+        path: '/admin/products'
+      });
+    }).catch(err => { console.log(err); });
 };
 
 exports.deleteProduct = (req, res, next) => {
   const id = req.body.id;
-  Product.delete(id);
-  Product.getProductWithId(id, (prod) => {
-    Cart.delete(id, prod.price);
-  })
-  res.redirect('/products');
+  Product.findByIdAndRemove(id)
+    .then(result => {
+      res.redirect('../admin/products');
+    })
+    .catch(err => console.log(err))
 }
