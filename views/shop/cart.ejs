@@ -5,12 +5,12 @@
                 <% if(products.length >0){ %>
                 <% for(const prod of products){ %>
                     <div aria-orientation="horizontal">
-                       <h1><%= prod.title %></h1>
-                        <img src="<%=prod.imageUrl%>" alt="book" height="200" width="200">
-                        <p><%= prod.description %></p>
+                       <h1><%= prod.productId.title %></h1>
+                        <img src="<%=prod.productId.imageUrl%>" alt="book" height="200" width="200">
+                        <p><%= prod.productId.description %></p>
                         <h2><%= prod.quantity%></h2>
                         <form action="/delete-cart-item" method="POST">
-                            <input type="hidden" name="id" value="<%= prod._id %>">
+                            <input type="hidden" name="id" value="<%= prod.productId._id %>">
                             <button class="btn" type="submit">Delete</button>
                         </form>
                     </div>

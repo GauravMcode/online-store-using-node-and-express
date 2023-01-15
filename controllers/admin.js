@@ -21,9 +21,9 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(title, price, description, imageUrl, null, req.user._id);
-  product.save()
-    .then((result) => {
+  const product = new Product({ title: title, price: price, description: description, imageUrl: imageUrl, userId: req.user._id });
+  product.save()   //save is the method by mongoose for that model
+    .then((result) => {    //although save method doesn't returns a promise but gives a then & catch bloc
       console.log('product added');
       res.redirect('/admin/products');
     })
@@ -55,16 +55,23 @@ exports.postEditProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(title, price, description, imageUrl, prodId);
-  product.update()
+  Product.findById(prodId)
+    .then(product => {
+      //product returned by findById is not a JS object but is a complete mongoose object. Therefore, we can call methods like save() on it
+      product.title = title,
+        product.price = price,
+        product.imageUrl = imageUrl,
+        product.description = description
+      return product.save()  //if save is passed to an existing product, it won't create a new product; instead it will update it.
+    })
     .then(() => {
-      res.redirect('/');
+      res.redirect('../admin/products');
     })
     .catch(err => console.log(err))
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       res.render('admin/products', {
         prods: products,
@@ -76,10 +83,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.deleteProduct = (req, res, next) => {
   const id = req.body.id;
-  Product.deleteById(id)
-    .then((prod) => {
-      return req.user.deleteById(id);
-    })
+  Product.findByIdAndRemove(id)
     .then(result => {
       res.redirect('../admin/products');
     })
