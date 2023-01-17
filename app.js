@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongodbStore = require('connect-mongodb-session')(session);  //this function execution returns a constructor function
 const csrf = require('csurf');
+const flash = require('connect-flash');
 
 
 const errorController = require('./controllers/error');
@@ -39,6 +40,7 @@ app.use(
 )
 
 app.use(protectedToken);
+app.use(flash());  //now we can access the flash from anywhere in our application in the req object
 
 app.use((req, res, next) => {  //these variables are passed to all the views
     res.locals.isAuthenticated = req.session.isLoggedIn;

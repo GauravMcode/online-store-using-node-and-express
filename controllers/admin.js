@@ -14,7 +14,6 @@ exports.getAddProduct = (req, res, next) => {
     formsCSS: true,
     productCSS: true,
     activeAddProduct: true,
-    isAuthenticated: req.session.isLoggedIn
   });
 };
 
@@ -46,7 +45,6 @@ exports.getEditProduct = (req, res, next) => {
         editing: editMode,
         formsCSS: true,
         productCSS: true,
-        isAuthenticated: req.session.isLoggedIn
       });
     })
     .catch(err => console.log(err));
@@ -81,7 +79,6 @@ exports.getProducts = (req, res, next) => {
         prods: products,
         pageTitle: 'Admin Products',
         path: '/admin/products',
-        isAuthenticated: req.session.isLoggedIn
       });
     }).catch(err => { console.log(err); });
 };
