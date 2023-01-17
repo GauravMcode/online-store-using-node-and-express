@@ -27,3 +27,29 @@ exports.postLogout = (req, res, next) => {
         res.redirect('/')
     });
 }
+
+exports.getSignup = (req, res, next) => {
+    res.render('auth/signup', {
+        path: '/signup',
+        pageTitle: 'SignUp',
+        isAuthenticated: req.session.isLoggedIn
+    })
+}
+
+exports.postSignup = (req, res, next) => {
+    const email = req.body.email;
+    const password = req.body.password;
+    const confirmPassword = req.body.confirmPassword;
+    User.find({ email: email })
+        .then(userDoc => {
+            if (userDoc) {
+                res.redirect('/signup')
+            }
+            const user = new User({ email: email, password: password, cart: { items: [] } });
+            user.save();
+        })
+        .then(result => {
+            res.redirect('/login')
+        })
+        .catch(err => console.log(err));
+}
