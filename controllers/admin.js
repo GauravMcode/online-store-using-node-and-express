@@ -12,7 +12,7 @@ exports.getAddProduct = (req, res, next) => {
     formsCSS: true,
     productCSS: true,
     activeAddProduct: true,
-    isAuthenticated: req.isLoggedIn
+    isAuthenticated: req.session.isLoggedIn
   });
 };
 
@@ -22,7 +22,7 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product({ title: title, price: price, description: description, imageUrl: imageUrl, userId: req.user._id });
+  const product = new Product({ title: title, price: price, description: description, imageUrl: imageUrl, userId: req.session.user._id });
   product.save()   //save is the method by mongoose for that model
     .then((result) => {    //although save method doesn't returns a promise but gives a then & catch bloc
       console.log('product added');
@@ -44,7 +44,7 @@ exports.getEditProduct = (req, res, next) => {
         editing: editMode,
         formsCSS: true,
         productCSS: true,
-        isAuthenticated: req.isLoggedIn
+        isAuthenticated: req.session.isLoggedIn
       });
     })
     .catch(err => console.log(err));
@@ -79,7 +79,7 @@ exports.getProducts = (req, res, next) => {
         prods: products,
         pageTitle: 'Admin Products',
         path: '/admin/products',
-        isAuthenticated: req.isLoggedIn
+        isAuthenticated: req.session.isLoggedIn
       });
     }).catch(err => { console.log(err); });
 };
