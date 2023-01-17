@@ -4,6 +4,8 @@ const Product = require('../models/product');
 // const Cart = require('../models/cart');
 // const User = require('../models/user');
 
+
+
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
     pageTitle: 'Add Product',
@@ -11,7 +13,7 @@ exports.getAddProduct = (req, res, next) => {
     editing: false,
     formsCSS: true,
     productCSS: true,
-    activeAddProduct: true
+    activeAddProduct: true,
   });
 };
 
@@ -21,7 +23,7 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product({ title: title, price: price, description: description, imageUrl: imageUrl, userId: req.user._id });
+  const product = new Product({ title: title, price: price, description: description, imageUrl: imageUrl, userId: req.session.user._id });
   product.save()   //save is the method by mongoose for that model
     .then((result) => {    //although save method doesn't returns a promise but gives a then & catch bloc
       console.log('product added');
@@ -76,7 +78,7 @@ exports.getProducts = (req, res, next) => {
       res.render('admin/products', {
         prods: products,
         pageTitle: 'Admin Products',
-        path: '/admin/products'
+        path: '/admin/products',
       });
     }).catch(err => { console.log(err); });
 };

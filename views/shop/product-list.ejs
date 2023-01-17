@@ -28,10 +28,13 @@
                                 </div>
                                 <div class="card__actions">
                                     <a class="btn" href="/products/<%= product._id %>">Details</a>
+                                    <% if(isAuthenticated){%>
                                     <form action="/add-to-cart" method="POST">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                         <input type="hidden" name="productId" value="<%= product._id %>">
                                         <button class="btn">Add to Cart</button>
                                     </form>
+                                    <% } %>
                                 </div>
                             </article>
                             <% } %>
