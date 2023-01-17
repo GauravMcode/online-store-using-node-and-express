@@ -48,13 +48,7 @@ app.use(
 
 app.use(authRoutes);
 
-// app.use((req, res, next) => {
-//     if (!req.session.user) {
-//         res.redirect('/login');
-//     } else {
-//         next();
-//     }
-// });
+
 
 
 app.use('/admin', adminRoutes);

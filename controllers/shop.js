@@ -102,7 +102,7 @@ exports.postCreateOrder = (req, res, next) => {
       const order = new Order({
         products: products,
         user: {
-          name: req.session.user.name,
+          // name: req.session.user.name,
           userId: req.session.user._id
         }
       })
@@ -120,7 +120,6 @@ exports.postCreateOrder = (req, res, next) => {
 exports.getOrders = (req, res, next) => {
   Order.find({ 'user.userId': req.session.user._id })
     .then((orders) => {
-      console.log(orders[0].products);
       res.render('shop/orders', {
         path: '/orders',
         pageTitle: 'Your Orders',
