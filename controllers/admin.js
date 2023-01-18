@@ -52,7 +52,6 @@ exports.getEditProduct = (req, res, next) => {
 
 exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.id;
-  console.log(prodId);
   const title = req.body.title;
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
@@ -60,20 +59,23 @@ exports.postEditProduct = (req, res, next) => {
   Product.findById(prodId)
     .then(product => {
       //product returned by findById is not a JS object but is a complete mongoose object. Therefore, we can call methods like save() on it
+      if (product.userId.toString() !== req.session.user._id.toString()) {
+        return res.redirect('/');
+      }
       product.title = title,
         product.price = price,
         product.imageUrl = imageUrl,
         product.description = description
-      return product.save()  //if save is passed to an existing product, it won't create a new product; instead it will update it.
-    })
-    .then(() => {
-      res.redirect('../admin/products');
+      product.save()  //if save is passed to an existing product, it won't create a new product; instead it will update it.
+        .then(() => {
+          res.redirect('../admin/products');
+        })
     })
     .catch(err => console.log(err))
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  Product.find({ userId: req.session.user._id })
     .then((products) => {
       res.render('admin/products', {
         prods: products,
@@ -85,7 +87,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.deleteProduct = (req, res, next) => {
   const id = req.body.id;
-  Product.findByIdAndRemove(id)
+  Product.deleteOne({ _id: id, userId: req.session.user._id })
     .then(result => {
       res.redirect('../admin/products');
     })
