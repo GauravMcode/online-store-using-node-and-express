@@ -69,7 +69,13 @@ exports.getSignup = (req, res, next) => {
         path: '/signup',
         pageTitle: 'SignUp',
         isAuthenticated: req.session.isLoggedIn,
-        errorMessage: req.flash('error')[0]
+        errorMessage: req.flash('error')[0],
+        olderInput: {
+            email: '',
+            password: '',
+            confirmPassword: ''
+        },
+        validatorErrors: []
     })
 }
 
@@ -85,7 +91,13 @@ exports.postSignup = (req, res, next) => {
             path: '/signup',
             pageTitle: 'SignUp',
             isAuthenticated: req.session.isLoggedIn,
-            errorMessage: errors.array()[0].msg
+            errorMessage: errors.array()[0].msg,
+            olderInput: {
+                email: email,
+                password: password,
+                confirmPassword: confirmPassword
+            },
+            validatorErrors: errors.array()
         })
     }
     User.find({ email: email })

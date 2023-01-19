@@ -52,6 +52,7 @@ router.post('/signup',
             }
             return true;
         }),
+
     authController.postSignup);
 
 /*we can apply as many middlewares for a path as we want
