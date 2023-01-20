@@ -44,8 +44,8 @@ router.post('/signup',
     //2 : check password
     check('password', 'The password should contain atleast 5 characters with only alphabets and numbers')  //second argument: default error msg
         .isLength({ min: 5 })  //minimun length of the value is 5
-        .isAlphanumeric()
-        .trim(),  //checks if the value is text or numbers only
+        .isAlphanumeric()       //checks if the value is text or numbers only
+        .trim(),
 
     //3 : check confirmPassword === password
     body('confirmPassword')
@@ -56,7 +56,6 @@ router.post('/signup',
             return true;
         })
         .trim(),
-
     authController.postSignup);
 
 /*we can apply as many middlewares for a path as we want

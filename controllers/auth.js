@@ -90,6 +90,7 @@ exports.getSignup = (req, res, next) => {
 }
 
 exports.postSignup = (req, res, next) => {
+    console.log('post signup........');
     const email = req.body.email;
     const password = req.body.password;
     const confirmPassword = req.body.confirmPassword;
