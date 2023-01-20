@@ -37,12 +37,15 @@ router.post('/signup',
                         //returns reject containing the error message, which in turn is percieved by validtor as error with error message 
                     }
                 })
-        }),
+        })
+        .trim()
+        .normalizeEmail(),
 
     //2 : check password
     check('password', 'The password should contain atleast 5 characters with only alphabets and numbers')  //second argument: default error msg
         .isLength({ min: 5 })  //minimun length of the value is 5
-        .isAlphanumeric(),  //checks if the value is text or numbers only
+        .isAlphanumeric()
+        .trim(),  //checks if the value is text or numbers only
 
     //3 : check confirmPassword === password
     body('confirmPassword')
@@ -51,7 +54,8 @@ router.post('/signup',
                 throw new Error('Confirm password should be equal to password');
             }
             return true;
-        }),
+        })
+        .trim(),
 
     authController.postSignup);
 

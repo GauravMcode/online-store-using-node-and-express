@@ -19,7 +19,12 @@ exports.getLogin = (req, res, next) => {
         path: '/login',
         pageTitle: 'Login',
         isAuthenticated: req.session.isLoggedIn,
-        errorMessage: req.flash('error')[0] //as it returns an array  of messages, so if no message it will return undefined
+        errorMessage: req.flash('error')[0], //as it returns an array  of messages, so if no message it will return undefined
+        olderInput: {
+            email: '',
+            password: '',
+        },
+        validatorErrors: []
     })
 }
 exports.postLogin = (req, res, next) => {
@@ -32,7 +37,12 @@ exports.postLogin = (req, res, next) => {
             path: '/login',
             pageTitle: 'Login',
             isAuthenticated: req.session.isLoggedIn,
-            errorMessage: errors.array()[0].msg
+            errorMessage: errors.array()[0].msg,
+            olderInput: {
+                email: email,
+                password: password,
+            },
+            validatorErrors: errors.array()
         })
     }
     User.findOne({ email: email })
