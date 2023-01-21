@@ -111,8 +111,6 @@ exports.postSignup = (req, res, next) => {
             validatorErrors: errors.array()
         })
     }
-    User.find({ email: email })
-
     //todo : psswd and confirm psswd check has alredy been done in validation
     // else if (password != confirmPassword) {
     //     console.log('2');
