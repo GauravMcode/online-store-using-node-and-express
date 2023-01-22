@@ -173,7 +173,7 @@ exports.postReset = (req, res, next) => {
                 transport.sendMail({
                     to: req.body.email,
                     from: 'mishrajiratlam532@gmail.com',
-                    subject: 'Signup Successfull!',
+                    subject: 'Reset Password',
                     html: `
                     <p>You requested a Password Reset</p>
                     <p>Click on this <a href="http://localhost:3000/reset/${token}">link</a>  to reset the password</p>

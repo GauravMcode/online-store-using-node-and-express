@@ -122,7 +122,7 @@ exports.postEditProduct = (req, res, next) => {
 
       //product returned by findById is not a JS object but is a complete mongoose object. Therefore, we can call methods like save() on it
       else if (product.userId.toString() !== req.session.user._id.toString()) {
-        return res.redirect('/');
+        return res.redirect('/');  //the product is not created by the current user, thus redirect
       }
       product.title = title,
         product.price = price,
