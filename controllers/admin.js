@@ -142,7 +142,9 @@ exports.postEditProduct = (req, res, next) => {
           res.redirect('../admin/products');
         })
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+      error500(err, next);
+    })
 }
 
 exports.getProducts = (req, res, next) => {
@@ -162,5 +164,7 @@ exports.deleteProduct = (req, res, next) => {
     .then(result => {
       res.redirect('../admin/products');
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+      error500(err, next);
+    })
 }

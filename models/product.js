@@ -56,14 +56,18 @@ module.exports = mongoose.model('Product', productSchema);  //('name to be asssi
 //       .then(result => {
 //         console.log(result);
 //       })
-//       .catch(err => console.log(err));
+//       .catch(err => {
+// error500(err, next);
+//     });
 //   }
 
 //   update() {
 //     const db = getDb();
 //     return db.collection('products').updateOne({ _id: this._id }, { $set: this })  //(filter to get value to update, new updated value)
 //       .then(result => console.log(result))
-//       .catch(err => console.log(err))
+//       .catch(err => {
+// error500(err, next);
+//     })
 //   }
 
 //   static fetchAll() {
@@ -75,7 +79,9 @@ module.exports = mongoose.model('Product', productSchema);  //('name to be asssi
 //         // console.log(products);
 //         return products;
 //       })
-//       .catch(err => console.log(err))
+//       .catch(err => {
+// error500(err, next);
+//     })
 //   }
 
 //   static findById(id) {
@@ -88,7 +94,9 @@ module.exports = mongoose.model('Product', productSchema);  //('name to be asssi
 //         // console.log(product);
 //         return product;
 //       })
-//       .catch(err => console.log(err));
+//       .catch(err => {
+// error500(err, next);
+//     });
 //   }
 
 //   static deleteById(id) {
@@ -98,7 +106,9 @@ module.exports = mongoose.model('Product', productSchema);  //('name to be asssi
 //       .then(() => {
 //         console.log('deleted');
 //       })
-//       .catch(err => console.log(err))
+//       .catch(err => {
+// error500(err, next);
+//     })
 //   }
 // }
 

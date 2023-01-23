@@ -77,7 +77,9 @@ module.exports = mongoose.model('User', userSchema);
 //         const db = getdb();
 //         return db.collection('users').insertOne(this)
 //             .then(result => console.log(result))
-//             .catch(err => console.log(err))
+//             .catch(err => {
+// error500(err, next);
+//     })
 //     }
 
 //     static findById(userId) {
@@ -85,7 +87,9 @@ module.exports = mongoose.model('User', userSchema);
 //         return db.collection('users').find({ _id: new mongodb.ObjectId(userId) })
 //             .next()
 //             .then(result => result)
-//             .catch(err => console.log(err))
+//             .catch(err => {
+// error500(err, next);
+//     })
 //     }
 
 //     getCart() {
@@ -142,7 +146,9 @@ module.exports = mongoose.model('User', userSchema);
 //             .then(result => {
 //                 return db.collection('users').updateOne({ _id: new mongodb.ObjectId(this._id) }, { $set: { cart: { items: [] } } })
 //             })
-//             .catch(err => console.log(err));
+//             .catch(err => {
+// error500(err, next);
+//     });
 //     }
 
 //     getOrders() {

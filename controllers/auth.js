@@ -13,6 +13,12 @@ const transport = nodemailer.createTransport({
     }
 })
 
+error500 = (err, next) => {
+    const error = new Error(err);
+    error.httpStatusCode = 500;
+    return next(error);
+  }  
+
 
 exports.getLogin = (req, res, next) => {
     res.render('auth/login', {
@@ -64,9 +70,13 @@ exports.postLogin = (req, res, next) => {
                     req.flash('error', 'Invalid email or password');
                     res.redirect('/login')
                 })
-                .catch(err => console.log(err))
+                .catch(err => {
+                    error500(err, next);
+                })
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+            error500(err, next);
+        })
 }
 exports.postLogout = (req, res, next) => {
     req.session.destroy(() => {
@@ -131,7 +141,9 @@ exports.postSignup = (req, res, next) => {
                 html: '<h1>Welcome to Node products shop. Your Signup was successfull</h1>'
             })
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+            error500(err, next);
+        })
 }
 
 exports.isAuth = (req, res, next) => {
@@ -201,7 +213,9 @@ exports.getNewPassword = (req, res, next) => {
                 token: token
             })
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+            error500(err, next);
+        })
 }
 
 exports.postNewPassword = (req, res, next) => {
@@ -227,5 +241,7 @@ exports.postNewPassword = (req, res, next) => {
         .then(result => {
             res.redirect('/login')
         })
-        .catch(err => console.log(err))
+        .catch(err => {
+            error500(err, next);
+        })
 }

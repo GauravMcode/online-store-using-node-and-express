@@ -3,6 +3,11 @@ const Order = require('../models/order');
 const Product = require('../models/product');
 const User = require('../models/user');
 
+error500 = (err, next) => {
+  const error = new Error(err);
+  error.httpStatusCode = 500;
+  return next(error);
+}
 
 
 exports.getProducts = (req, res, next) => {
@@ -31,7 +36,9 @@ exports.getProductDetails = (req, res, next) => {
         isAuthenticated: req.session.isLoggedIn
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      error500(err, next);
+    });
 }
 
 exports.getIndex = (req, res, next) => {
@@ -58,7 +65,9 @@ exports.postAddtoCart = (req, res, next) => {
       res.redirect('/cart')
       // console.log(result);
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+      error500(err, next);
+    })
 }
 
 exports.getCart = (req, res, next) => {
@@ -85,7 +94,9 @@ exports.deleteCartItem = (req, res, next) => {
     .then(() => {
       res.redirect('/cart');
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+      error500(err, next);
+    })
 
 }
 
@@ -113,7 +124,9 @@ exports.postCreateOrder = (req, res, next) => {
     .then(result => {
       res.redirect('/orders');
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+      error500(err, next);
+    })
 }
 
 exports.getOrders = (req, res, next) => {
