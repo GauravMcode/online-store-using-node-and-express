@@ -56,7 +56,13 @@ app.use(authRoutes);
 app.use('/admin', adminRoutes);
 app.use(shopRoutes);
 
+app.get('/500', errorController.get500);
+
 app.use(errorController.get404);
+
+app.use((errors, req, res, next) => {
+    res.redirect('/500')
+}) //special error handling midddleware
 
 mongoose.connect(MONGODB_URI)
     .then(result => {

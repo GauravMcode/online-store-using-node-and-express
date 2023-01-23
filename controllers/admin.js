@@ -4,6 +4,12 @@ const Product = require('../models/product');
 
 const { validationResult } = require('express-validator/check');
 
+error500 = (err, next) => {
+  const error = new Error(err);
+  error.httpStatusCode = 500;
+  return next(error);
+}
+
 
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/edit-product', {
@@ -57,7 +63,7 @@ exports.postAddProduct = (req, res, next) => {
       console.log('product added');
       res.redirect('/admin/products');
     })
-    .catch((err) => { console.log(err); });
+    .catch((err) => { error500(err, next); });
 };
 
 
@@ -68,6 +74,7 @@ exports.getEditProduct = (req, res, next) => {
   console.log(editMode);
   Product.findById(prodId)
     .then((product) => {
+      throw new Error('invalid')
       res.render('admin/edit-product', {
         pageTitle: 'Edit Product',
         path: '/admin/products',
@@ -86,7 +93,9 @@ exports.getEditProduct = (req, res, next) => {
         validatorErrors: []
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      error500(err, next);
+    });
 };
 
 exports.postEditProduct = (req, res, next) => {
