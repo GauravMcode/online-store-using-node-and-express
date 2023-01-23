@@ -74,7 +74,6 @@ exports.getEditProduct = (req, res, next) => {
   console.log(editMode);
   Product.findById(prodId)
     .then((product) => {
-      throw new Error('invalid')
       res.render('admin/edit-product', {
         pageTitle: 'Edit Product',
         path: '/admin/products',
