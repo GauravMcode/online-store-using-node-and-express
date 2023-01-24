@@ -7,6 +7,7 @@ const session = require('express-session');
 const MongodbStore = require('connect-mongodb-session')(session);  //this function execution returns a constructor function
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
 
 
 const errorController = require('./controllers/error');
@@ -31,8 +32,18 @@ const store = MongodbStore({
 
 const protectedToken = csrf();
 
+const fileStorage = multer.diskStorage({   //returns a storage engine with destiantion and filename conffiguration
+    destination: (req, file, cb) => {
+        console.log(file);
+        cb(null, 'images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().getTime() + '-' + file.originalname);
+    }
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(multer({ storage: fileStorage }).single('image'))  //returns a middleware that looks for multipart/form-data encoded form 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(
@@ -62,6 +73,10 @@ app.use(errorController.get404);
 
 //special error handling midddleware 
 app.use((errors, req, res, next) => {
+    console.log(errors);
+    if (!req.session) {
+        return res.redirect('/500');
+    }
     res.status(500).render('500', {
         pageTitle: 'Error!',
         path: '/500',
