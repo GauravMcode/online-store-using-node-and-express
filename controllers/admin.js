@@ -34,10 +34,32 @@ exports.getAddProduct = (req, res, next) => {
 
 exports.postAddProduct = (req, res, next) => {
   const title = req.body.title;
-  const imageUrl = req.file;
+  const image = req.file;
   const price = req.body.price;
   const description = req.body.description;
   const errors = validationResult(req);
+  console.log(image);
+  //as image wasn't able to be read so re-rendering the page
+  if (!image) {
+    return res.status(422).render('admin/edit-product', {
+      pageTitle: 'Add Product',
+      path: '/admin/add-product',
+      editing: false,
+      errors: true,
+      formsCSS: true,
+      productCSS: true,
+      activeAddProduct: true,
+      errorMessage: 'image was not  of valid format',
+      olderInput: {
+        title: title,
+        price: price,
+        description: description,
+      },
+      validatorErrors: []
+    });
+  }
+
+  //as validation failed so re-renderring the page
   if (!errors.isEmpty()) {
     return res.status(422).render('admin/edit-product', {
       pageTitle: 'Add Product',
@@ -50,14 +72,13 @@ exports.postAddProduct = (req, res, next) => {
       errorMessage: errors.array()[0].msg,
       olderInput: {
         title: title,
-        imageUrl: imageUrl,
         price: price,
         description: description,
       },
       validatorErrors: errors.array()
     });
   }
-  const product = new Product({ title: title, price: price, description: description, imageUrl: imageUrl, userId: req.session.user._id });
+  const product = new Product({ title: title, price: price, description: description, imageUrl: image.path, userId: req.session.user._id });
   product.save()   //save is the method by mongoose for that model
     .then((result) => {    //although save method doesn't returns a promise but gives a then & catch bloc
       console.log('product added');
@@ -102,7 +123,7 @@ exports.getEditProduct = (req, res, next) => {
 exports.postEditProduct = (req, res, next) => {
   const prodId = req.body.id;
   const title = req.body.title;
-  const imageUrl = req.body.imageUrl;
+  const image = req.file;
   const price = req.body.price;
   const description = req.body.description;
   console.log(prodId);
@@ -122,7 +143,6 @@ exports.postEditProduct = (req, res, next) => {
           errorMessage: errors.array()[0].msg,
           olderInput: {
             title: title,
-            imageUrl: imageUrl,
             price: price,
             description: description,
           },
@@ -134,9 +154,11 @@ exports.postEditProduct = (req, res, next) => {
       else if (product.userId.toString() !== req.session.user._id.toString()) {
         return res.redirect('/');  //the product is not created by the current user, thus redirect
       }
+      if (image) {
+        product.imageUrl = image.path;
+      }
       product.title = title,
         product.price = price,
-        product.imageUrl = imageUrl,
         product.description = description
       product.save()  //if save is passed to an existing product, it won't create a new product; instead it will update it.
         .then(() => {

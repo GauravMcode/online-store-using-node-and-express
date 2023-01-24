@@ -32,9 +32,8 @@ const store = MongodbStore({
 
 const protectedToken = csrf();
 
-const fileStorage = multer.diskStorage({   //returns a storage engine with destiantion and filename conffiguration
+const fileStorage = multer.diskStorage({   //returns a storage engine with destiantion and filename configuration
     destination: (req, file, cb) => {
-        console.log(file);
         cb(null, 'images');
     },
     filename: (req, file, cb) => {
@@ -42,9 +41,10 @@ const fileStorage = multer.diskStorage({   //returns a storage engine with desti
     }
 });
 
-const fileFilter = (req, file, cb) => {
+const fileFilter = (req, file, cb) => {  //to filter files for only of specific types
+    console.log(file);
     if (
-        file.mimtype === 'image/jpg' || file.mimtype === 'image/jpeg' || file.mimtype === 'image/png'
+        file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'
     ) {
         cb(null, true);    //the file is accepted
     } else {
@@ -54,7 +54,7 @@ const fileFilter = (req, file, cb) => {
 }
 
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({ storage: fileStorage, fileFilter }).single('image'))  //returns a middleware that looks for multipart/form-data encoded form 
+app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'))  //returns a middleware that looks for multipart/form-data encoded form 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(
