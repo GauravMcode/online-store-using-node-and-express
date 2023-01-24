@@ -18,7 +18,6 @@ router.get('/products', adminController.getProducts);
 // /admin/add-product => POST
 router.post('/add-product',
     body('title', 'The title should contain atleast 5 characters with only alphabets and numbers').isAlphanumeric().isLength({ min: 3 }).trim(),
-    body('imageUrl', 'Enter a correct image url').isURL(),
     body('price', 'price has to be a decimal value').isFloat(),
     body('description', 'The description should contain atleast 5 characters and max 100 characters').isLength({ min: 3, max: 100 }).trim(),
     adminController.postAddProduct);
