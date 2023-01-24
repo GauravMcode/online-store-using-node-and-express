@@ -42,8 +42,19 @@ const fileStorage = multer.diskStorage({   //returns a storage engine with desti
     }
 });
 
+const fileFilter = (req, file, cb) => {
+    if (
+        file.mimtype === 'image/jpg' || file.mimtype === 'image/jpeg' || file.mimtype === 'image/png'
+    ) {
+        cb(null, true);    //the file is accepted
+    } else {
+        console.log('file isn\'t of right format ');
+        cb(null, false);  //the file is rejected
+    }
+}
+
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(multer({ storage: fileStorage }).single('image'))  //returns a middleware that looks for multipart/form-data encoded form 
+app.use(multer({ storage: fileStorage, fileFilter }).single('image'))  //returns a middleware that looks for multipart/form-data encoded form 
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(

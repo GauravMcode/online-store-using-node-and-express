@@ -38,7 +38,6 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   const errors = validationResult(req);
-  console.log('request session.......', req.session);
   if (!errors.isEmpty()) {
     return res.status(422).render('admin/edit-product', {
       pageTitle: 'Add Product',
@@ -65,7 +64,6 @@ exports.postAddProduct = (req, res, next) => {
       res.redirect('/admin/products');
     })
     .catch((err) => {
-      console.log('request session.......', req.session);
       error500(err, next);
     });
 };
