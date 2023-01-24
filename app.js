@@ -55,7 +55,9 @@ const fileFilter = (req, file, cb) => {  //to filter files for only of specific 
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'))  //returns a middleware that looks for multipart/form-data encoded form 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'))); //to statically server public folder
+app.use(express.static(path.join(__dirname, 'images'))); //to statically server images folder :
+// It will bring file inside the images folder as if it is  in root folder
 
 app.use(
     session({ secret: 'some secret hashed value', resave: false, saveUninitialized: false, store: store })

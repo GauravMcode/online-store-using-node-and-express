@@ -78,7 +78,7 @@ exports.postAddProduct = (req, res, next) => {
       validatorErrors: errors.array()
     });
   }
-  const product = new Product({ title: title, price: price, description: description, imageUrl: image.path, userId: req.session.user._id });
+  const product = new Product({ title: title, price: price, description: description, imageUrl: image.filename, userId: req.session.user._id });
   product.save()   //save is the method by mongoose for that model
     .then((result) => {    //although save method doesn't returns a promise but gives a then & catch bloc
       console.log('product added');
@@ -155,7 +155,7 @@ exports.postEditProduct = (req, res, next) => {
         return res.redirect('/');  //the product is not created by the current user, thus redirect
       }
       if (image) {
-        product.imageUrl = image.path;
+        product.imageUrl = image.filename;
       }
       product.title = title,
         product.price = price,
