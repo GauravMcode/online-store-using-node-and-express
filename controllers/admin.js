@@ -1,6 +1,8 @@
+const path = require('path');
 
 const { deleteById } = require('../models/product');
 const Product = require('../models/product');
+const fileHelper = require('../util/file');
 
 const { validationResult } = require('express-validator/check');
 
@@ -155,6 +157,7 @@ exports.postEditProduct = (req, res, next) => {
         return res.redirect('/');  //the product is not created by the current user, thus redirect
       }
       if (image) {
+        fileHelper.deleteFile(path.join('images', product.imageUrl));
         product.imageUrl = image.filename;
       }
       product.title = title,
@@ -183,7 +186,13 @@ exports.getProducts = (req, res, next) => {
 
 exports.deleteProduct = (req, res, next) => {
   const id = req.body.id;
-  Product.deleteOne({ _id: id, userId: req.session.user._id })
+  Product.findById(id).then(prod => {
+    if (!prod) {
+      return next(new Error('No Product found'));
+    }
+    fileHelper.deleteFile(path.join('images', prod.imageUrl));
+    return Product.deleteOne({ _id: id, userId: req.session.user._id })
+  })
     .then(result => {
       res.redirect('../admin/products');
     })
