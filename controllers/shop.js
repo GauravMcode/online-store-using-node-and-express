@@ -158,15 +158,19 @@ exports.getInvoice = (req, res, next) => {
       }
       const invoiceName = 'invoice-' + orderId + '.pdf';
       const invoicePath = path.join('data', 'invoices', invoiceName);
-      fs.readFile(invoicePath, (err, data) => {
-        if (err) {
-          return next(err);
-        }
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `inline; filename=${invoiceName}`);
-        res.send(data);
-        res.end();
-      })
+      // fs.readFile(invoicePath, (err, data) => {
+      //   if (err) {
+      //     return next(err);
+      //   }
+      //   res.setHeader('Content-Type', 'application/pdf');
+      //   res.setHeader('Content-Disposition', `inline; filename=${invoiceName}`);
+      //   res.send(data);
+      //   res.end();
+      // })
+      const readStreamFile = fs.createReadStream(invoicePath);  //reading stream instead of storing it completely in memory
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename=${invoiceName}`);
+      readStreamFile.pipe(res);   //the stream data as soon as read(i.e. each  chunk) is piped to writable stream i.e. response 
     })
     .catch(err => next(err));
 }
