@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const PDFDocument = require('pdfkit');   //pdfkit exposes a pdf document constructor
+
 const Order = require('../models/order');
 const Product = require('../models/product');
 const User = require('../models/user');
@@ -158,19 +160,22 @@ exports.getInvoice = (req, res, next) => {
       }
       const invoiceName = 'invoice-' + orderId + '.pdf';
       const invoicePath = path.join('data', 'invoices', invoiceName);
-      // fs.readFile(invoicePath, (err, data) => {
-      //   if (err) {
-      //     return next(err);
-      //   }
-      //   res.setHeader('Content-Type', 'application/pdf');
-      //   res.setHeader('Content-Disposition', `inline; filename=${invoiceName}`);
-      //   res.send(data);
-      //   res.end();
-      // })
-      const readStreamFile = fs.createReadStream(invoicePath);  //reading stream instead of storing it completely in memory
+
+      //setting up pdf and piping
+      const pdfDoc = new PDFDocument();  //creates a new pdf document, which is also a readable stream
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `inline; filename=${invoiceName}`);
-      readStreamFile.pipe(res);   //the stream data as soon as read(i.e. each  chunk) is piped to writable stream i.e. response 
+      pdfDoc.pipe(fs.createWriteStream(invoicePath)); //piping from readable stream to writable stream (saves into server)
+      pdfDoc.pipe(res); //piping from readable stream to writable stream (serves to client)
+
+      //writing to pdf
+      pdfDoc.text('Hello World!');
+
+      //end writing to pdf
+      pdfDoc.end(); //done writing. thus, the file will be saved and response will be sent
+
+      //reading stream instead of storing it completely in memory
+      //the stream data as soon as read(i.e. each  chunk) is piped to writable stream i.e. response 
     })
     .catch(err => next(err));
 }
