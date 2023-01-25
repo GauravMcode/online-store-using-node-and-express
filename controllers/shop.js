@@ -1,7 +1,12 @@
+const fs = require('fs');
+const path = require('path');
+
+const PDFDocument = require('pdfkit');   //pdfkit exposes a pdf document constructor
 
 const Order = require('../models/order');
 const Product = require('../models/product');
 const User = require('../models/user');
+
 
 error500 = (err, next) => {
   const error = new Error(err);
@@ -146,3 +151,46 @@ exports.getCheckout = (req, res, next) => {
     pageTitle: 'Checkout',
   });
 };
+
+exports.getInvoice = (req, res, next) => {
+  const orderId = req.params.orderId;
+  Order.findById(orderId)
+    .then(order => {
+      if (order.user.userId.toString() !== req.session.user._id.toString()) {
+        return next(new Error('Unauthorized'));
+      }
+      const invoiceName = 'invoice-' + orderId + '.pdf';
+      const invoicePath = path.join('data', 'invoices', invoiceName);
+
+      //setting up pdf and piping
+      const pdfDoc = new PDFDocument();  //creates a new pdf document, which is also a readable stream
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `inline; filename=${invoiceName}`);
+      pdfDoc.pipe(fs.createWriteStream(invoicePath)); //piping from readable stream to writable stream (saves into server)
+      pdfDoc.pipe(res); //piping from readable stream to writable stream (serves to client)
+
+      //writing to pdf
+      pdfDoc.fontSize(25).text('INVOICE', { align: 'center' });
+      pdfDoc.fontSize(20).text('*********************************************************');
+      pdfDoc.lineGap(2);
+      let toatalPrice = 0;
+      order.products.forEach(prod => {
+        toatalPrice += prod.product.price * prod.quantity
+        pdfDoc.lineGap(10);
+        pdfDoc.fontSize(16).text(`${prod.product.title}, qty : ${prod.quantity}`);
+        pdfDoc.fontSize(16).text(`Price: $${prod.product.price * prod.quantity}`);
+        pdfDoc.lineGap(10);
+      });
+      pdfDoc.lineGap(10);
+      pdfDoc.fontSize(20).text('*********************************************************');
+      pdfDoc.fontSize(22).text(`Total Price : $${toatalPrice}`, { align: 'center' });
+
+
+      //end writing to pdf
+      pdfDoc.end(); //done writing. thus, the file will be saved and response will be sent
+
+      //reading stream instead of storing it completely in memory
+      //the stream data as soon as read(i.e. each  chunk) is piped to writable stream i.e. response 
+    })
+    .catch(err => next(err));
+}
