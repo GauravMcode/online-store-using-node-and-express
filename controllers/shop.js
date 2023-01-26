@@ -7,6 +7,7 @@ const Order = require('../models/order');
 const Product = require('../models/product');
 const User = require('../models/user');
 
+const ITEMS_PER_PAGE = 2;
 
 error500 = (err, next) => {
   const error = new Error(err);
@@ -47,7 +48,10 @@ exports.getProductDetails = (req, res, next) => {
 }
 
 exports.getIndex = (req, res, next) => {
+  const page = req.query.page;
   Product.find()
+    .skip((page - 1) * ITEMS_PER_PAGE)  //skips items of previous page
+    .limit(ITEMS_PER_PAGE)         //limits items of current page
     .then((products) => {
       res.render('shop/index', {
         prods: products,
