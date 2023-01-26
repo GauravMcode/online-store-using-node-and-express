@@ -17,15 +17,28 @@ error500 = (err, next) => {
 
 
 exports.getProducts = (req, res, next) => {
-  Product.find()   //method provided by the mongoose to fetch all the products from the database
-    .then((products) => {
-      res.render('shop/product-list', {
-        prods: products,
-        pageTitle: 'All Products',
-        path: '/products',
-        isAuthenticated: req.session.isLoggedIn
-      });
-    })
+  let page = parseInt(req.query.page) || 1;
+  let totalItems;
+  let totalPages;
+  Product.countDocuments().then(itemCount => {
+    totalItems = itemCount;
+    totalPages = Math.ceil(itemCount / ITEMS_PER_PAGE);
+    console.log(page);
+    console.log(typeof totalPages);
+    return Product.find()  //method provided by the mongoose to fetch all the products from the database
+      .skip((page - 1) * ITEMS_PER_PAGE)  //skips items of previous page
+      .limit(ITEMS_PER_PAGE)         //limits items of current page
+      .then((products) => {
+        res.render('shop/product-list', {
+          prods: products,
+          pageTitle: 'All Products',
+          path: '/products',
+          isAuthenticated: req.session.isLoggedIn,
+          currentPage: page,
+          totalPages: Math.ceil(totalItems / ITEMS_PER_PAGE),
+        });
+      })
+  })
     .catch((err) => {
       console.log(err);
     });
@@ -67,8 +80,6 @@ exports.getIndex = (req, res, next) => {
           isAuthenticated: req.session.isLoggedIn,
           currentPage: page,
           totalPages: Math.ceil(totalItems / ITEMS_PER_PAGE),
-          // hasNextPage: page < totalPages,
-          // hasPreviousPage: totalPages > 1,
         });
       })
   })
