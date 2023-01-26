@@ -7,7 +7,7 @@ const Order = require('../models/order');
 const Product = require('../models/product');
 const User = require('../models/user');
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 1;
 
 error500 = (err, next) => {
   const error = new Error(err);
@@ -48,18 +48,30 @@ exports.getProductDetails = (req, res, next) => {
 }
 
 exports.getIndex = (req, res, next) => {
-  const page = req.query.page;
-  Product.find()
-    .skip((page - 1) * ITEMS_PER_PAGE)  //skips items of previous page
-    .limit(ITEMS_PER_PAGE)         //limits items of current page
-    .then((products) => {
-      res.render('shop/index', {
-        prods: products,
-        pageTitle: 'Shop',
-        path: '/',
-        isAuthenticated: req.session.isLoggedIn
-      });
-    })
+  let page = parseInt(req.query.page) || 1;
+  let totalItems;
+  let totalPages;
+  Product.countDocuments().then(itemCount => {
+    totalItems = itemCount;
+    totalPages = Math.ceil(itemCount / ITEMS_PER_PAGE);
+    console.log(page);
+    console.log(typeof totalPages);
+    return Product.find()
+      .skip((page - 1) * ITEMS_PER_PAGE)  //skips items of previous page
+      .limit(ITEMS_PER_PAGE)         //limits items of current page
+      .then((products) => {
+        res.render('shop/index', {
+          prods: products,
+          pageTitle: 'Shop',
+          path: '/',
+          isAuthenticated: req.session.isLoggedIn,
+          currentPage: page,
+          totalPages: Math.ceil(totalItems / ITEMS_PER_PAGE),
+          // hasNextPage: page < totalPages,
+          // hasPreviousPage: totalPages > 1,
+        });
+      })
+  })
     .catch((err) => {
       console.log(err);
     });
