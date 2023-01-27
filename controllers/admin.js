@@ -185,7 +185,7 @@ exports.getProducts = (req, res, next) => {
 };
 
 exports.deleteProduct = (req, res, next) => {
-  const id = req.body.id;
+  const id = req.params.prodId;
   Product.findById(id).then(prod => {
     if (!prod) {
       return next(new Error('No Product found'));
@@ -194,9 +194,9 @@ exports.deleteProduct = (req, res, next) => {
     return Product.deleteOne({ _id: id, userId: req.session.user._id })
   })
     .then(result => {
-      res.redirect('../admin/products');
+      res.status(200).json({ message: 'Success' });
     })
     .catch(err => {
-      error500(err, next);
+      res.status(500).json({ message: 'Delete Product Fail' });
     })
 }
