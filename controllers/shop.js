@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PDFDocument = require('pdfkit');   //pdfkit exposes a pdf document constructor
+const stripe = require('stripe')('sk_test_51MV8JvSCiQvTL5IjG6TY9HdhSCtCWKeOroaqCjKhiRza9UOuZmR7dHIZ5BsBEWniWXG6rQPRC8OJMn7B0O0lS41G00hpJlpuGx');
 
 const Order = require('../models/order');
 const Product = require('../models/product');
@@ -133,24 +134,48 @@ exports.deleteCartItem = (req, res, next) => {
 }
 
 exports.getCheckout = (req, res, next) => {
+  let products;
+  let totalPrice = 0;
   req.session.user = new User().init(req.session.user);
   req.session.user
     .populate('cart.items.productId')
     .then((user) => {
-      const products = user.cart.items;
-      let totalPrice = 0;
+      products = user.cart.items;
       products.forEach(p => { totalPrice += p.quantity * p.productId.price })
+      return stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        mode: 'payment',
+        line_items: products.map(p => {
+          return {
+            quantity: p.quantity,
+            price_data: {
+              currency: 'inr',
+              unit_amount: p.productId.price * 100,
+              product_data: {
+                name: p.productId.title,
+                description: p.productId.description
+              },
+            }
+          }
+        }),
+        customer_email: req.session.user.email,
+        success_url: req.protocol + '://' + req.get('host') + '/checkout/success',
+        cancel_url: req.protocol + '://' + req.get('host') + '/checkout/cancel',
+      })
+    })
+    .then(session => {
       res.render('shop/checkout', {
         path: '/cart',
         pageTitle: 'Your Cart',
         products: products,
-        totalPrice: totalPrice
+        totalPrice: totalPrice,
+        sessionId: session.id
       });
     })
     .catch(err => { console.log(err); });
 };
 
-exports.postCreateOrder = (req, res, next) => {
+exports.getOrder = (req, res, next) => {
   console.log('creating order.........');
   req.session.user = new User().init(req.session.user);
   req.session.user
