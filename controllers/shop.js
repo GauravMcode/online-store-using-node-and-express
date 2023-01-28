@@ -132,6 +132,24 @@ exports.deleteCartItem = (req, res, next) => {
 
 }
 
+exports.getCheckout = (req, res, next) => {
+  req.session.user = new User().init(req.session.user);
+  req.session.user
+    .populate('cart.items.productId')
+    .then((user) => {
+      const products = user.cart.items;
+      let totalPrice = 0;
+      products.forEach(p => { totalPrice += p.quantity * p.productId.price })
+      res.render('shop/checkout', {
+        path: '/cart',
+        pageTitle: 'Your Cart',
+        products: products,
+        totalPrice: totalPrice
+      });
+    })
+    .catch(err => { console.log(err); });
+};
+
 exports.postCreateOrder = (req, res, next) => {
   console.log('creating order.........');
   req.session.user = new User().init(req.session.user);
@@ -172,12 +190,7 @@ exports.getOrders = (req, res, next) => {
     })
 };
 
-exports.getCheckout = (req, res, next) => {
-  res.render('shop/checkout', {
-    path: '/checkout',
-    pageTitle: 'Checkout',
-  });
-};
+
 
 exports.getInvoice = (req, res, next) => {
   const orderId = req.params.orderId;

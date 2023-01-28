@@ -1,0 +1,20 @@
+<%- include('../includes/head.ejs') %>
+<link rel="stylesheet" href="/css/product.css">
+    </head>
+
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+        <main>
+            <% for(const prod of products){ %>
+                <div aria-orientation="horizontal" class="grid">
+                   <h1 class="product__title"><%= prod.productId.title %></h1>
+                    <!-- <img src="<%=prod.productId.imageUrl%>" alt="book" class="card__image"> -->
+                    <p class="product__description"><%= prod.productId.description %></p>
+                    <h2 class="card__content">Qty: <%= prod.quantity%></h2>
+                </div>
+            <% } %>
+            <div class="centered">
+                <h2>Total Price: $ <%= totalPrice %></h2>
+            </div>
+        </main>
+        <%- include('../includes/end.ejs') %>
