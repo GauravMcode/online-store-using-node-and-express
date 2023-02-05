@@ -8,6 +8,7 @@ const MongodbStore = require('connect-mongodb-session')(session);  //this functi
 const csrf = require('csurf');
 const flash = require('connect-flash');
 const multer = require('multer');
+const helmet = require('helmet');
 
 
 const errorController = require('./controllers/error');
@@ -54,6 +55,7 @@ const fileFilter = (req, file, cb) => {  //to filter files for only of specific 
     }
 }
 
+app.use(helmet())  //adds various headers to each response to set secure response headers
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'))  //returns a middleware that looks for multipart/form-data encoded form 
 app.use(express.static(path.join(__dirname, 'public'))); //to statically server public folder
