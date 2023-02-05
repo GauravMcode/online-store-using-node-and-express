@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -10,7 +11,8 @@ const flash = require('connect-flash');
 const multer = require('multer');
 const helmet = require('helmet');
 const compression = require('compression');
-const compressible = require('compressible');
+const compressible = require('compressible'); //(optional) : just for seeing file type
+const morgan = require('morgan') //for logging user req data
 
 
 const errorController = require('./controllers/error');
@@ -18,6 +20,7 @@ const errorController = require('./controllers/error');
 
 const app = express();
 
+console.log(compressible("text/html")); //to check if a mimtype is compressible or not
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -57,9 +60,12 @@ const fileFilter = (req, file, cb) => {  //to filter files for only of specific 
     }
 }
 
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }) //{flags : a} means that log data will be appended and not overriden
+
 app.use(helmet())  //adds various headers to each response to set secure response headers
 app.use(compression())  //compresses assets i.e. css js files for faster loading
-console.log(compressible("text/html")); //to check if a mimtype is compressible or not
+app.use(morgan("combined", { stream: accessLogStream }))
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(multer({ storage: fileStorage, fileFilter: fileFilter }).single('image'))  //returns a middleware that looks for multipart/form-data encoded form 
