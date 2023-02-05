@@ -15,6 +15,7 @@ const errorController = require('./controllers/error');
 
 const app = express();
 
+
 app.set('view engine', 'ejs');
 app.set('views', 'views');
 
@@ -23,7 +24,7 @@ const shopRoutes = require('./routes/shop');
 const authRoutes = require('./routes/auth');
 const User = require('./models/user');
 
-const MONGODB_URI = 'mongodb+srv://gaurav:fireup@cluster0.cwp7tik.mongodb.net/shop?retryWrites=true&w=majority'
+const MONGODB_URI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0.cwp7tik.mongodb.net/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`
 
 const store = MongodbStore({
     uri: MONGODB_URI,
@@ -99,7 +100,7 @@ app.use((errors, req, res, next) => {
 
 mongoose.connect(MONGODB_URI)
     .then(result => {
-        app.listen(3000);
+        app.listen(process.env.PORT || 3000);
     })
     .catch(err => {
         error500(err, next);
