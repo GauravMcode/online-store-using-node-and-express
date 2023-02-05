@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PDFDocument = require('pdfkit');   //pdfkit exposes a pdf document constructor
-const stripe = require('stripe')('sk_test_51MV8JvSCiQvTL5IjG6TY9HdhSCtCWKeOroaqCjKhiRza9UOuZmR7dHIZ5BsBEWniWXG6rQPRC8OJMn7B0O0lS41G00hpJlpuGx');
+const stripe = require('stripe')(`${process.env.STRIPE_KEY}`);
 
 const Order = require('../models/order');
 const Product = require('../models/product');

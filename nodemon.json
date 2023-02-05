@@ -1,0 +1,10 @@
+{
+    "env": {
+        "MONGO_USER": "gaurav",
+        "MONGO_PASSWORD": "fireup",
+        "MONGO_DB_NAME": "shop",
+        "STRIPE_KEY": "sk_test_51MV8JvSCiQvTL5IjG6TY9HdhSCtCWKeOroaqCjKhiRza9UOuZmR7dHIZ5BsBEWniWXG6rQPRC8OJMn7B0O0lS41G00hpJlpuGx",
+        "SHOP_EMAIL": "mishrajiratlam532@gmail.com",
+        "SHOP_EMAIL_PASSWORD": "mjczzjhaeejckwhk"
+    }
+}
