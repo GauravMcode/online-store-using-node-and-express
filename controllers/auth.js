@@ -8,8 +8,8 @@ const User = require("../models/user");
 const transport = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'mishrajiratlam532@gmail.com',
-        pass: 'mjczzjhaeejckwhk'
+        user: `${process.env.SHOP_EMAIL}`,
+        pass: `${process.env.SHOP_EMAIL_PASSWORD}`
     }
 })
 
@@ -17,7 +17,7 @@ error500 = (err, next) => {
     const error = new Error(err);
     error.httpStatusCode = 500;
     return next(error);
-  }  
+}
 
 
 exports.getLogin = (req, res, next) => {
