@@ -14,3 +14,5 @@ dynamic routes and querry params:
 - Deleting Cart Items
 - Display Cart Items on the Cart Page
 - Deleting Cart Items
+
+SET MONGO_USER=gaurav&&SET MONGO_PASSWORD=fireup&&SET MONGO_DB_NAME=shop&&SET STRIPE_KEY=sk_test_51MV8JvSCiQvTL5IjG6TY9HdhSCtCWKeOroaqCjKhiRza9UOuZmR7dHIZ5BsBEWniWXG6rQPRC8OJMn7B0O0lS41G00hpJlpuGx&&SET SHOP_EMAIL=mishrajiratlam532&&SET SHOP_EMAIL_PASSWORD=mjczzjhaeejckwhk&&
