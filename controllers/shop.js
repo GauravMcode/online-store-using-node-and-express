@@ -2,13 +2,13 @@ const fs = require('fs');
 const path = require('path');
 
 const PDFDocument = require('pdfkit');   //pdfkit exposes a pdf document constructor
-const stripe = require('stripe')(`${process.env.STRIPE_KEY}`);
+const stripe = require('stripe')(process.env.STRIPE_KEY);
 
 const Order = require('../models/order');
 const Product = require('../models/product');
 const User = require('../models/user');
 
-const ITEMS_PER_PAGE = 1;
+const ITEMS_PER_PAGE = 2;
 
 error500 = (err, next) => {
   const error = new Error(err);
