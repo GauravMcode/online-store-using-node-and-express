@@ -243,12 +243,12 @@ exports.getInvoice = (req, res, next) => {
         toatalPrice += prod.product.price * prod.quantity
         pdfDoc.lineGap(10);
         pdfDoc.fontSize(16).text(`${prod.product.title}, qty : ${prod.quantity}`);
-        pdfDoc.fontSize(16).text(`Price: $${prod.product.price * prod.quantity}`);
+        pdfDoc.fontSize(16).text(`Price: Rs.${prod.product.price * prod.quantity}`);
         pdfDoc.lineGap(10);
       });
       pdfDoc.lineGap(10);
       pdfDoc.fontSize(20).text('*********************************************************');
-      pdfDoc.fontSize(22).text(`Total Price : $${toatalPrice}`, { align: 'center' });
+      pdfDoc.fontSize(22).text(`Total Price : Rs.${toatalPrice}`, { align: 'center' });
 
 
       //end writing to pdf
