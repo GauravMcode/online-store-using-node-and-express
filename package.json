@@ -15,6 +15,7 @@
     "nodemon": "^2.0.20"
   },
   "dependencies": {
+    "@cyclic.sh/s3fs": "^1.2.8",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
     "compressible": "^2.0.18",

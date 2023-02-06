@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('fs');
+const fs = require('@cyclic.sh/s3fs');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -60,11 +60,11 @@ const fileFilter = (req, file, cb) => {  //to filter files for only of specific 
     }
 }
 
-// const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }) //{flags : a} means that log data will be appended and not overriden
+const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }) //{flags : a} means that log data will be appended and not overriden
 
 app.use(helmet({ crossOriginEmbedderPolicy: false }))  //adds various headers to each response to set secure response headers
 app.use(compression())  //compresses assets i.e. css js files for faster loading
-// app.use(morgan("combined", { stream: accessLogStream }))
+app.use(morgan("combined", { stream: accessLogStream }))
 app.use(
     helmet.contentSecurityPolicy({ //to set the CSP to enable access to script src of stripe
         directives: {
