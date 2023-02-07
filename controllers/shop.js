@@ -165,7 +165,8 @@ exports.getCheckout = (req, res, next) => {
         pageTitle: 'Your Cart',
         products: products,
         totalPrice: totalPrice,
-        sessionId: session.id
+        sessionId: session.id,
+        stripePubKey: process.env.STRIPE_PUBLIC_KEY
       });
     })
     .catch(err => { console.log(err); });
