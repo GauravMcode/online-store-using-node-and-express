@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { check, body } = require('express-validator/check');
+const { check, body } = require('express-validator');
 const User = require('../models/user');
 //import only check function from the express-validator  object
 //body function will only check in the body for that field

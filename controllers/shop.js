@@ -24,8 +24,6 @@ exports.getProducts = (req, res, next) => {
   Product.countDocuments().then(itemCount => {
     totalItems = itemCount;
     totalPages = Math.ceil(itemCount / ITEMS_PER_PAGE);
-    console.log(page);
-    console.log(typeof totalPages);
     return Product.find()  //method provided by the mongoose to fetch all the products from the database
       .skip((page - 1) * ITEMS_PER_PAGE)  //skips items of previous page
       .limit(ITEMS_PER_PAGE)         //limits items of current page
@@ -68,8 +66,6 @@ exports.getIndex = (req, res, next) => {
   Product.countDocuments().then(itemCount => {
     totalItems = itemCount;
     totalPages = Math.ceil(itemCount / ITEMS_PER_PAGE);
-    console.log(page);
-    console.log(typeof totalPages);
     return Product.find()
       .skip((page - 1) * ITEMS_PER_PAGE)  //skips items of previous page
       .limit(ITEMS_PER_PAGE)         //limits items of current page

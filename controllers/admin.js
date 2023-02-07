@@ -4,7 +4,7 @@ const { deleteById } = require('../models/product');
 const Product = require('../models/product');
 const fileHelper = require('../util/file');
 
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 
 error500 = (err, next) => {
   const error = new Error(err);
@@ -96,7 +96,6 @@ exports.postAddProduct = (req, res, next) => {
 exports.getEditProduct = (req, res, next) => {
   const prodId = req.params.productId;
   const editMode = req.query.edit
-  console.log(editMode);
   Product.findById(prodId)
     .then((product) => {
       res.render('admin/edit-product', {
@@ -128,7 +127,6 @@ exports.postEditProduct = (req, res, next) => {
   const image = req.file;
   const price = req.body.price;
   const description = req.body.description;
-  console.log(prodId);
   Product.findById(prodId)
     .then(product => {
       const errors = validationResult(req);

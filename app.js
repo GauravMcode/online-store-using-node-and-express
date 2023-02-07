@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('fs');
+// const fs = require('fs');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -20,7 +20,7 @@ const errorController = require('./controllers/error');
 
 const app = express();
 
-console.log(compressible("text/html")); //to check if a mimtype is compressible or not
+// console.log(compressible("text/html")); //to check if a mimtype is compressible or not
 
 app.set('view engine', 'ejs');
 app.set('views', 'views');
@@ -49,7 +49,6 @@ const fileStorage = multer.diskStorage({   //returns a storage engine with desti
 });
 
 const fileFilter = (req, file, cb) => {  //to filter files for only of specific types
-    console.log(file);
     if (
         file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'
     ) {
@@ -60,11 +59,11 @@ const fileFilter = (req, file, cb) => {  //to filter files for only of specific 
     }
 }
 
-const accessLogStream = fs.writeFile(path.join(__dirname, 'access.log'), { flags: 'a' }) //{flags : a} means that log data will be appended and not overriden
+// const accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' }) //{flags : a} means that log data will be appended and not overriden
 
 app.use(helmet({ crossOriginEmbedderPolicy: false }))  //adds various headers to each response to set secure response headers
 app.use(compression())  //compresses assets i.e. css js files for faster loading
-app.use(morgan("combined", { stream: accessLogStream }))
+// app.use(morgan("combined", { stream: accessLogStream }))
 app.use(
     helmet.contentSecurityPolicy({ //to set the CSP to enable access to script src of stripe
         directives: {
@@ -121,6 +120,7 @@ app.use((errors, req, res, next) => {
     });
 })
 
+mongoose.set('strictQuery', false)
 mongoose.connect(MONGODB_URI)
     .then(result => {
         app.listen(process.env.PORT || 3000);
